@@ -165,4 +165,25 @@ python = "uv run python"
         assert_eq!(commands.get("mvn").unwrap(), "mvn clean compile");
         assert_eq!(commands.get("python").unwrap(), "uv run python");
     }
+
+    #[test]
+    fn test_parse_empty_config() {
+        let content = "";
+        let config = parse_config(content).unwrap();
+        assert!(config.clean.is_none());
+        assert!(config.generate.is_none());
+        assert!(config.projects.is_none());
+        assert!(config.groups.is_none());
+    }
+
+    #[test]
+    fn test_parse_partial_config() {
+        let content = r#"
+[clean]
+directories = ["temp"]
+"#;
+        let config = parse_config(content).unwrap();
+        assert_eq!(config.clean.unwrap().directories, vec!["temp"]);
+        assert!(config.generate.is_none());
+    }
 }
