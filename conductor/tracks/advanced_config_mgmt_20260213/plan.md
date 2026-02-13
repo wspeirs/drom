@@ -7,10 +7,10 @@
 - [x] Task: Implement `commands.toml` parsing c0089d1
     - [x] Create `commands.toml` sample file
     - [x] Implement parsing logic for the command alias mapping
-- [ ] Task: Write tests for enhanced configuration parsing
-    - [ ] Test parsing of a full `drom.toml` with all new sections
-    - [ ] Test parsing of `commands.toml`
-    - [ ] Test error handling for missing sections or malformed TOML
+- [x] Task: Write tests for enhanced configuration parsing f806f51
+    - [x] Test parsing of a full `drom.toml` with all new sections
+    - [x] Test parsing of `commands.toml`
+    - [x] Test error handling for missing sections or malformed TOML
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Configuration Schema and Parsing' (Protocol in workflow.md)
 
 ## Phase 2: Parallel Cleanup and Command Resolution
