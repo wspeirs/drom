@@ -54,8 +54,11 @@ impl Config {
             }
 
             for handle in handles {
-                handle.join().map_err(|_| {
-                    std::io::Error::new(std::io::ErrorKind::Other, "Thread panicked during cleanup")
+                handle.join().map_err(|e| {
+                    std::io::Error::new(
+                        std::io::ErrorKind::Other,
+                        format!("Cleanup thread panicked: {:?}", e),
+                    )
                 })??;
             }
         }
@@ -65,12 +68,25 @@ impl Config {
     fn execute_all(&self, commands: &HashMap<String, String>) -> Result<(), std::io::Error> {
         self.perform_clean()?;
 
-        let mut completed_generate = std::collections::HashSet::new();
+        let mut completed_tasks = std::collections::HashSet::new();
 
         if let Some(generate_tasks) = &self.generate {
+            let mut required_deps = std::collections::HashSet::new();
+            if let Some(projects) = &self.projects {
+                for project in projects {
+                    if let Some(deps) = &project.depends_on {
+                        for dep in deps {
+                            required_deps.insert(dep.clone());
+                        }
+                    }
+                }
+            }
+
             for task in generate_tasks {
-                task.execute()?;
-                completed_generate.insert(task.name.clone());
+                if required_deps.contains(&task.name) {
+                    task.execute()?;
+                    completed_tasks.insert(task.name.clone());
+                }
             }
         }
 
@@ -78,15 +94,19 @@ impl Config {
             for project in projects {
                 if let Some(deps) = &project.depends_on {
                     for dep in deps {
-                        if !completed_generate.contains(dep) {
+                        if !completed_tasks.contains(dep) {
                             return Err(std::io::Error::new(
                                 std::io::ErrorKind::Other,
-                                format!("Dependency '{}' for project '{}' not found or failed", dep, project.name),
+                                format!(
+                                    "Dependency '{}' for project '{}' not found or has not been executed yet",
+                                    dep, project.name
+                                ),
                             ));
                         }
                     }
                 }
                 project.execute(commands)?;
+                completed_tasks.insert(project.name.clone());
             }
         }
 
