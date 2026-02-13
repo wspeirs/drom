@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use std::collections::HashMap;
 use std::fs;
 use std::process::Command;
 
@@ -61,6 +62,10 @@ impl Project {
 }
 
 fn parse_config(content: &str) -> Result<Config, toml::de::Error> {
+    toml::from_str(content)
+}
+
+fn parse_commands(content: &str) -> Result<HashMap<String, String>, toml::de::Error> {
     toml::from_str(content)
 }
 
@@ -148,5 +153,16 @@ projects = ["api"]
         assert_eq!(config.generate.as_ref().unwrap().len(), 1);
         assert_eq!(config.projects.as_ref().unwrap().len(), 1);
         assert_eq!(config.groups.as_ref().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn test_parse_commands() {
+        let content = r#"
+mvn = "mvn clean compile"
+python = "uv run python"
+"#;
+        let commands = parse_commands(content).unwrap();
+        assert_eq!(commands.get("mvn").unwrap(), "mvn clean compile");
+        assert_eq!(commands.get("python").unwrap(), "uv run python");
     }
 }
