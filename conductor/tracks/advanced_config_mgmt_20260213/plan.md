@@ -13,7 +13,7 @@
     - [x] Test error handling for missing sections or malformed TOML
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Configuration Schema and Parsing' (Protocol in workflow.md)
 
-## Phase 2: Parallel Cleanup and Command Resolution
+## Phase 2: Parallel Cleanup and Command Resolution [checkpoint: d4ac76e]
 - [x] Task: Implement parallel cleanup logic d549910
     - [x] Add logic to iterate through the `clean` section and delete directories in parallel (using `std::fs` and potentially threads or a crate if needed, though `std` is preferred)
 - [x] Task: Implement Command Template Injection 62629da
@@ -22,7 +22,7 @@
 - [x] Task: Write tests for cleanup and resolution 2affef1
     - [x] Test that multiple directories are deleted correctly
     - [x] Test that commands are correctly resolved and arguments are appended
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Parallel Cleanup and Command Resolution' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Parallel Cleanup and Command Resolution' (Protocol in workflow.md)
 
 ## Phase 3: Dependency-Driven Execution
 - [ ] Task: Implement dependency resolution logic
