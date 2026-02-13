@@ -14,8 +14,8 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Configuration Schema and Parsing' (Protocol in workflow.md)
 
 ## Phase 2: Parallel Cleanup and Command Resolution
-- [ ] Task: Implement parallel cleanup logic
-    - [ ] Add logic to iterate through the `clean` section and delete directories in parallel (using `std::fs` and potentially threads or a crate if needed, though `std` is preferred)
+- [x] Task: Implement parallel cleanup logic d549910
+    - [x] Add logic to iterate through the `clean` section and delete directories in parallel (using `std::fs` and potentially threads or a crate if needed, though `std` is preferred)
 - [ ] Task: Implement Command Template Injection
     - [ ] Implement logic to resolve command aliases from `commands.toml`
     - [ ] Implement logic to append project-specific arguments to the base command
