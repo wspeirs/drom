@@ -10,7 +10,7 @@
 - [x] Task: Define and parse configuration 6a8a07c
     - [x] Create a sample `drom.toml`
     - [x] Implement TOML parsing logic in Rust
-- [~] Task: Implement execution logic
-    - [ ] Use `std::process::Command` to execute parsed tasks
-    - [ ] Implement basic output handling
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Core Logic' (Protocol in workflow.md)
+- [x] Task: Implement execution logic 6cf2e55
+    - [x] Use `std::process::Command` to execute parsed tasks
+    - [x] Implement basic output handling
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Core Logic' (Protocol in workflow.md)
