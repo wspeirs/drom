@@ -1,9 +1,9 @@
 # Implementation Plan - Implement advanced configuration and project management
 
 ## Phase 1: Configuration Schema and Parsing
-- [ ] Task: Update data models for `drom.toml`
-    - [ ] Add `Clean`, `Generate`, `Project`, and `Group` structs to `src/main.rs`
-    - [ ] Update `Config` struct to include the new sections
+- [x] Task: Update data models for `drom.toml` 3cb8530
+    - [x] Add `Clean`, `Generate`, `Project`, and `Group` structs to `src/main.rs`
+    - [x] Update `Config` struct to include the new sections
 - [ ] Task: Implement `commands.toml` parsing
     - [ ] Create `commands.toml` sample file
     - [ ] Implement parsing logic for the command alias mapping
