@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Initialize Rust project and implement basic task execution**
+- [~] **Track: Initialize Rust project and implement basic task execution**
   *Link: [./conductor/tracks/initialize_rust_project_20260213/](./conductor/tracks/initialize_rust_project_20260213/)*

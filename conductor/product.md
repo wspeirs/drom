@@ -9,8 +9,8 @@
 
 ## Core Goals
 - **Simplicity:** Provide an intuitive interface and configuration for defining and executing tasks.
-- **Portability:** Ensure consistent behavior across various operating systems and environments.
+- **Portability:** Ensure consistent behavior across various operating systems and environments by leveraging Rust.
 
 ## Key Features
-- **Task Definition:** Define tasks using a clean, human-readable configuration format (e.g., TOML).
+- **Task Definition:** Define tasks using a clean, human-readable configuration format by using TOML.
 - **Dependency Management:** Support for defining task execution order and dependencies.
