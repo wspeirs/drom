@@ -2,6 +2,7 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs;
 use std::process::Command;
+use std::thread;
 
 #[derive(Debug, Deserialize)]
 struct Config {
@@ -12,6 +13,33 @@ struct Config {
     projects: Option<Vec<Project>>,
     #[serde(rename = "group")]
     groups: Option<Vec<Group>>,
+}
+
+impl Config {
+    fn perform_clean(&self) -> Result<(), std::io::Error> {
+        if let Some(clean) = &self.clean {
+            let mut handles = vec![];
+            for dir in &clean.directories {
+                let dir = dir.clone();
+                let handle = thread::spawn(move || {
+                    if std::path::Path::new(&dir).exists() {
+                        println!("Cleaning directory: {}", dir);
+                        fs::remove_dir_all(&dir)
+                    } else {
+                        Ok(())
+                    }
+                });
+                handles.push(handle);
+            }
+
+            for handle in handles {
+                handle.join().map_err(|_| {
+                    std::io::Error::new(std::io::ErrorKind::Other, "Thread panicked during cleanup")
+                })??;
+            }
+        }
+        Ok(())
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -185,5 +213,26 @@ directories = ["temp"]
         let config = parse_config(content).unwrap();
         assert_eq!(config.clean.unwrap().directories, vec!["temp"]);
         assert!(config.generate.is_none());
+    }
+
+    #[test]
+    fn test_clean_directories() {
+        let dirs = vec!["test_dir1".to_string(), "test_dir2".to_string()];
+        for dir in &dirs {
+            fs::create_dir_all(dir).unwrap();
+        }
+        
+        let config = Config {
+            clean: Some(Clean { directories: dirs.clone() }),
+            generate: None,
+            projects: None,
+            groups: None,
+        };
+        
+        config.perform_clean().unwrap();
+        
+        for dir in &dirs {
+            assert!(!std::path::Path::new(dir).exists());
+        }
     }
 }
