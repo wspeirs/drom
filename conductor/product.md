@@ -12,5 +12,5 @@
 - **Portability:** Ensure consistent behavior across various operating systems and environments by leveraging Rust.
 
 ## Key Features
-- **Task Definition:** Define tasks using a clean, human-readable configuration format by using TOML.
+- **Task Definition:** Define tasks using a clean, human-readable configuration format in `drom.toml`.
 - **Dependency Management:** Support for defining task execution order and dependencies.
