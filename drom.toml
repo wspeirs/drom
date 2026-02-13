@@ -1,0 +1,3 @@
+[[task]]
+name = "hello"
+command = "echo 'Hello from drom!'"
