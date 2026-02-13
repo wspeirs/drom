@@ -34,3 +34,6 @@
     - [x] Test that a project waits for a `generate` task to finish
     - [x] Test that unrelated projects can run without waiting for unrelated `generate` tasks
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Dependency-Driven Execution' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 6b0c10f
