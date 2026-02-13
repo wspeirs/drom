@@ -57,6 +57,7 @@ struct Generate {
 struct Project {
     name: String,
     command: String,
+    args: Option<Vec<String>>,
     depends_on: Option<Vec<String>>,
 }
 
@@ -67,14 +68,24 @@ struct Group {
 }
 
 impl Project {
-    fn execute(&self) -> Result<(), std::io::Error> {
+    fn resolve_command(&self, commands: &HashMap<String, String>) -> String {
+        let base_command = commands.get(&self.command).cloned().unwrap_or_else(|| self.command.clone());
+        if let Some(args) = &self.args {
+            format!("{} {}", base_command, args.join(" "))
+        } else {
+            base_command
+        }
+    }
+
+    fn execute(&self, commands: &HashMap<String, String>) -> Result<(), std::io::Error> {
+        let full_command = self.resolve_command(commands);
         let mut child = if cfg!(target_os = "windows") {
             Command::new("cmd")
-                .args(["/C", &self.command])
+                .args(["/C", &full_command])
                 .spawn()?
         } else {
             Command::new("sh")
-                .args(["-c", &self.command])
+                .args(["-c", &full_command])
                 .spawn()?
         };
 
@@ -101,10 +112,18 @@ fn main() {
     let config_content = fs::read_to_string("drom.toml").expect("Failed to read drom.toml");
     let config = parse_config(&config_content).expect("Failed to parse drom.toml");
     
+    let commands_content = fs::read_to_string("commands.toml").unwrap_or_default();
+    let commands = parse_commands(&commands_content).unwrap_or_default();
+
+    if let Err(e) = config.perform_clean() {
+        eprintln!("Error during cleanup: {}", e);
+        std::process::exit(1);
+    }
+
     if let Some(projects) = config.projects {
         for project in projects {
             println!("Running project: {}", project.name);
-            if let Err(e) = project.execute() {
+            if let Err(e) = project.execute(&commands) {
                 eprintln!("Error executing project {}: {}", project.name, e);
                 std::process::exit(1);
             }
@@ -142,9 +161,11 @@ command = "echo test"
         let project = Project {
             name: "test".to_string(),
             command: "echo 'success'".to_string(),
+            args: None,
             depends_on: None,
         };
-        assert!(project.execute().is_ok());
+        let commands = HashMap::new();
+        assert!(project.execute(&commands).is_ok());
     }
 
     #[test]
@@ -152,9 +173,11 @@ command = "echo test"
         let project = Project {
             name: "fail".to_string(),
             command: "exit 1".to_string(),
+            args: None,
             depends_on: None,
         };
-        assert!(project.execute().is_err());
+        let commands = HashMap::new();
+        assert!(project.execute(&commands).is_err());
     }
 
     #[test]
@@ -234,5 +257,21 @@ directories = ["temp"]
         for dir in &dirs {
             assert!(!std::path::Path::new(dir).exists());
         }
+    }
+
+    #[test]
+    fn test_resolve_command() {
+        let mut commands = HashMap::new();
+        commands.insert("mvn".to_string(), "mvn clean compile".to_string());
+        
+        let project = Project {
+            name: "api".to_string(),
+            command: "mvn".to_string(),
+            args: Some(vec!["test".to_string()]),
+            depends_on: None,
+        };
+        
+        let resolved = project.resolve_command(&commands);
+        assert_eq!(resolved, "mvn clean compile test");
     }
 }
