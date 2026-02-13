@@ -28,8 +28,8 @@
 - [x] Task: Implement dependency resolution logic 381c74c
     - [x] Implement a simple dependency tracker for `generate` tasks and `projects`
     - [x] Ensure projects wait for their specific `generate` dependencies
-- [ ] Task: Implement group-aware execution (CLI)
-    - [ ] Add ability to identify projects belonging to a group
+- [x] Task: Implement group-aware execution (CLI) 15020a6
+    - [x] Add ability to identify projects belonging to a group
 - [ ] Task: Write tests for dependency execution
     - [ ] Test that a project waits for a `generate` task to finish
     - [ ] Test that unrelated projects can run without waiting for unrelated `generate` tasks
