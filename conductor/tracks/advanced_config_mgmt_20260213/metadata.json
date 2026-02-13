@@ -1,0 +1,8 @@
+{
+  "track_id": "advanced_config_mgmt_20260213",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-13T18:45:00Z",
+  "updated_at": "2026-02-13T18:45:00Z",
+  "description": "Implement 3 sections for the config file (in TOML): clean, generate, and projects. Support commands.toml for command resolution and template injection."
+}
