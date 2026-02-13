@@ -30,7 +30,7 @@
     - [x] Ensure projects wait for their specific `generate` dependencies
 - [x] Task: Implement group-aware execution (CLI) 15020a6
     - [x] Add ability to identify projects belonging to a group
-- [ ] Task: Write tests for dependency execution
-    - [ ] Test that a project waits for a `generate` task to finish
-    - [ ] Test that unrelated projects can run without waiting for unrelated `generate` tasks
+- [x] Task: Write tests for dependency execution 3e7df48
+    - [x] Test that a project waits for a `generate` task to finish
+    - [x] Test that unrelated projects can run without waiting for unrelated `generate` tasks
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Dependency-Driven Execution' (Protocol in workflow.md)
