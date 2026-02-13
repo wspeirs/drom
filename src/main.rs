@@ -4,17 +4,40 @@ use std::process::Command;
 
 #[derive(Debug, Deserialize)]
 struct Config {
-    #[serde(rename = "task")]
-    tasks: Vec<Task>,
+    clean: Option<Clean>,
+    #[serde(rename = "generate")]
+    generate: Option<Vec<Generate>>,
+    #[serde(rename = "project")]
+    projects: Option<Vec<Project>>,
+    #[serde(rename = "group")]
+    groups: Option<Vec<Group>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Clean {
+    directories: Vec<String>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
-struct Task {
+struct Generate {
     name: String,
     command: String,
 }
 
-impl Task {
+#[derive(Debug, Deserialize, PartialEq)]
+struct Project {
+    name: String,
+    command: String,
+    depends_on: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+struct Group {
+    name: String,
+    projects: Vec<String>,
+}
+
+impl Project {
     fn execute(&self) -> Result<(), std::io::Error> {
         let mut child = if cfg!(target_os = "windows") {
             Command::new("cmd")
@@ -45,11 +68,13 @@ fn main() {
     let config_content = fs::read_to_string("drom.toml").expect("Failed to read drom.toml");
     let config = parse_config(&config_content).expect("Failed to parse drom.toml");
     
-    for task in config.tasks {
-        println!("Running task: {}", task.name);
-        if let Err(e) = task.execute() {
-            eprintln!("Error executing task {}: {}", task.name, e);
-            std::process::exit(1);
+    if let Some(projects) = config.projects {
+        for project in projects {
+            println!("Running project: {}", project.name);
+            if let Err(e) = project.execute() {
+                eprintln!("Error executing project {}: {}", project.name, e);
+                std::process::exit(1);
+            }
         }
     }
 }
@@ -61,14 +86,15 @@ mod tests {
     #[test]
     fn test_parse_config() {
         let content = r#"
-[[task]]
+[[project]]
 name = "test"
 command = "echo test"
 "#;
         let config = parse_config(content).unwrap();
-        assert_eq!(config.tasks.len(), 1);
-        assert_eq!(config.tasks[0].name, "test");
-        assert_eq!(config.tasks[0].command, "echo test");
+        let projects = config.projects.unwrap();
+        assert_eq!(projects.len(), 1);
+        assert_eq!(projects[0].name, "test");
+        assert_eq!(projects[0].command, "echo test");
     }
 
     #[test]
@@ -80,19 +106,47 @@ command = "echo test"
 
     #[test]
     fn test_task_execute_success() {
-        let task = Task {
+        let project = Project {
             name: "test".to_string(),
             command: "echo 'success'".to_string(),
+            depends_on: None,
         };
-        assert!(task.execute().is_ok());
+        assert!(project.execute().is_ok());
     }
 
     #[test]
     fn test_task_execute_failure() {
-        let task = Task {
+        let project = Project {
             name: "fail".to_string(),
             command: "exit 1".to_string(),
+            depends_on: None,
         };
-        assert!(task.execute().is_err());
+        assert!(project.execute().is_err());
+    }
+
+    #[test]
+    fn test_parse_advanced_config() {
+        let content = r#"
+[clean]
+directories = ["dist", "build"]
+
+[[generate]]
+name = "proto"
+command = "protoc --rust_out=. src/proto/*.proto"
+
+[[project]]
+name = "api"
+command = "cargo run"
+depends_on = ["proto"]
+
+[[group]]
+name = "backend"
+projects = ["api"]
+"#;
+        let config = parse_config(content).unwrap();
+        assert_eq!(config.clean.as_ref().unwrap().directories.len(), 2);
+        assert_eq!(config.generate.as_ref().unwrap().len(), 1);
+        assert_eq!(config.projects.as_ref().unwrap().len(), 1);
+        assert_eq!(config.groups.as_ref().unwrap().len(), 1);
     }
 }
