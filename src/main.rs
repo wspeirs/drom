@@ -92,6 +92,19 @@ impl Config {
 
         Ok(())
     }
+
+    fn get_group_projects(&self, group_name: &str) -> Option<Vec<&Project>> {
+        let group = self.groups.as_ref()?.iter().find(|g| g.name == group_name)?;
+        let mut group_projects = vec![];
+        if let Some(projects) = &self.projects {
+            for project_name in &group.projects {
+                if let Some(project) = projects.iter().find(|p| p.name == *project_name) {
+                    group_projects.push(project);
+                }
+            }
+        }
+        Some(group_projects)
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -353,5 +366,28 @@ depends_on = ["gen"]
         
         assert!(std::path::Path::new("gen.txt").exists());
         fs::remove_file("gen.txt").unwrap();
+    }
+
+    #[test]
+    fn test_get_group_projects() {
+        let content = r#"
+[[project]]
+name = "api"
+command = "echo api"
+
+[[project]]
+name = "web"
+command = "echo web"
+
+[[group]]
+name = "backend"
+projects = ["api"]
+"#;
+        let config = parse_config(content).unwrap();
+        let backend_projects = config.get_group_projects("backend").unwrap();
+        assert_eq!(backend_projects.len(), 1);
+        assert_eq!(backend_projects[0].name, "api");
+        
+        assert!(config.get_group_projects("non_existent").is_none());
     }
 }
