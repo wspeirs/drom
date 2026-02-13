@@ -4,9 +4,9 @@
 - [x] Task: Update data models for `drom.toml` 3cb8530
     - [x] Add `Clean`, `Generate`, `Project`, and `Group` structs to `src/main.rs`
     - [x] Update `Config` struct to include the new sections
-- [ ] Task: Implement `commands.toml` parsing
-    - [ ] Create `commands.toml` sample file
-    - [ ] Implement parsing logic for the command alias mapping
+- [x] Task: Implement `commands.toml` parsing c0089d1
+    - [x] Create `commands.toml` sample file
+    - [x] Implement parsing logic for the command alias mapping
 - [ ] Task: Write tests for enhanced configuration parsing
     - [ ] Test parsing of a full `drom.toml` with all new sections
     - [ ] Test parsing of `commands.toml`
