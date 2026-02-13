@@ -19,9 +19,9 @@
 - [x] Task: Implement Command Template Injection 62629da
     - [x] Implement logic to resolve command aliases from `commands.toml`
     - [x] Implement logic to append project-specific arguments to the base command
-- [ ] Task: Write tests for cleanup and resolution
-    - [ ] Test that multiple directories are deleted correctly
-    - [ ] Test that commands are correctly resolved and arguments are appended
+- [x] Task: Write tests for cleanup and resolution 2affef1
+    - [x] Test that multiple directories are deleted correctly
+    - [x] Test that commands are correctly resolved and arguments are appended
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Parallel Cleanup and Command Resolution' (Protocol in workflow.md)
 
 ## Phase 3: Dependency-Driven Execution
