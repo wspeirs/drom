@@ -25,9 +25,9 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Parallel Cleanup and Command Resolution' (Protocol in workflow.md)
 
 ## Phase 3: Dependency-Driven Execution
-- [ ] Task: Implement dependency resolution logic
-    - [ ] Implement a simple dependency tracker for `generate` tasks and `projects`
-    - [ ] Ensure projects wait for their specific `generate` dependencies
+- [x] Task: Implement dependency resolution logic 381c74c
+    - [x] Implement a simple dependency tracker for `generate` tasks and `projects`
+    - [x] Ensure projects wait for their specific `generate` dependencies
 - [ ] Task: Implement group-aware execution (CLI)
     - [ ] Add ability to identify projects belonging to a group
 - [ ] Task: Write tests for dependency execution
