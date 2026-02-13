@@ -15,6 +15,27 @@ struct Config {
     groups: Option<Vec<Group>>,
 }
 
+fn run_command(command: &str) -> Result<(), std::io::Error> {
+    let mut child = if cfg!(target_os = "windows") {
+        Command::new("cmd")
+            .args(["/C", command])
+            .spawn()?
+    } else {
+        Command::new("sh")
+            .args(["-c", command])
+            .spawn()?
+    };
+
+    let status = child.wait()?;
+    if !status.success() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!("Command failed with exit code: {:?}", status.code()),
+        ));
+    }
+    Ok(())
+}
+
 impl Config {
     fn perform_clean(&self) -> Result<(), std::io::Error> {
         if let Some(clean) = &self.clean {
@@ -40,6 +61,37 @@ impl Config {
         }
         Ok(())
     }
+
+    fn execute_all(&self, commands: &HashMap<String, String>) -> Result<(), std::io::Error> {
+        self.perform_clean()?;
+
+        let mut completed_generate = std::collections::HashSet::new();
+
+        if let Some(generate_tasks) = &self.generate {
+            for task in generate_tasks {
+                task.execute()?;
+                completed_generate.insert(task.name.clone());
+            }
+        }
+
+        if let Some(projects) = &self.projects {
+            for project in projects {
+                if let Some(deps) = &project.depends_on {
+                    for dep in deps {
+                        if !completed_generate.contains(dep) {
+                            return Err(std::io::Error::new(
+                                std::io::ErrorKind::Other,
+                                format!("Dependency '{}' for project '{}' not found or failed", dep, project.name),
+                            ));
+                        }
+                    }
+                }
+                project.execute(commands)?;
+            }
+        }
+
+        Ok(())
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -51,6 +103,13 @@ struct Clean {
 struct Generate {
     name: String,
     command: String,
+}
+
+impl Generate {
+    fn execute(&self) -> Result<(), std::io::Error> {
+        println!("Running generate task: {}", self.name);
+        run_command(&self.command)
+    }
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -78,25 +137,9 @@ impl Project {
     }
 
     fn execute(&self, commands: &HashMap<String, String>) -> Result<(), std::io::Error> {
+        println!("Running project: {}", self.name);
         let full_command = self.resolve_command(commands);
-        let mut child = if cfg!(target_os = "windows") {
-            Command::new("cmd")
-                .args(["/C", &full_command])
-                .spawn()?
-        } else {
-            Command::new("sh")
-                .args(["-c", &full_command])
-                .spawn()?
-        };
-
-        let status = child.wait()?;
-        if !status.success() {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                format!("Command failed with exit code: {:?}", status.code()),
-            ));
-        }
-        Ok(())
+        run_command(&full_command)
     }
 }
 
@@ -115,19 +158,9 @@ fn main() {
     let commands_content = fs::read_to_string("commands.toml").unwrap_or_default();
     let commands = parse_commands(&commands_content).unwrap_or_default();
 
-    if let Err(e) = config.perform_clean() {
-        eprintln!("Error during cleanup: {}", e);
+    if let Err(e) = config.execute_all(&commands) {
+        eprintln!("Execution error: {}", e);
         std::process::exit(1);
-    }
-
-    if let Some(projects) = config.projects {
-        for project in projects {
-            println!("Running project: {}", project.name);
-            if let Err(e) = project.execute(&commands) {
-                eprintln!("Error executing project {}: {}", project.name, e);
-                std::process::exit(1);
-            }
-        }
     }
 }
 
@@ -297,5 +330,28 @@ directories = ["temp"]
             groups: None,
         };
         assert!(config.perform_clean().is_ok());
+    }
+
+    #[test]
+    fn test_dependency_execution() {
+        let content = r#"
+[[generate]]
+name = "gen"
+command = "echo 'generating' > gen.txt"
+
+[[project]]
+name = "proj"
+command = "cat"
+args = ["gen.txt"]
+depends_on = ["gen"]
+"#;
+        let config = parse_config(content).unwrap();
+        let commands = HashMap::new();
+        
+        // This will fail until dependencies are implemented
+        config.execute_all(&commands).unwrap();
+        
+        assert!(std::path::Path::new("gen.txt").exists());
+        fs::remove_file("gen.txt").unwrap();
     }
 }
