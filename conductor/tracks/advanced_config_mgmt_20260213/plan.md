@@ -22,7 +22,7 @@
 - [x] Task: Write tests for cleanup and resolution 2affef1
     - [x] Test that multiple directories are deleted correctly
     - [x] Test that commands are correctly resolved and arguments are appended
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Parallel Cleanup and Command Resolution' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Parallel Cleanup and Command Resolution' (Protocol in workflow.md)
 
 ## Phase 3: Dependency-Driven Execution
 - [ ] Task: Implement dependency resolution logic
