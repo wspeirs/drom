@@ -390,4 +390,21 @@ projects = ["api"]
         
         assert!(config.get_group_projects("non_existent").is_none());
     }
+
+    #[test]
+    fn test_failing_dependency() {
+        let content = r#"
+[[generate]]
+name = "fail_gen"
+command = "exit 1"
+
+[[project]]
+name = "proj"
+command = "echo success"
+depends_on = ["fail_gen"]
+"#;
+        let config = parse_config(content).unwrap();
+        let commands = HashMap::new();
+        assert!(config.execute_all(&commands).is_err());
+    }
 }
