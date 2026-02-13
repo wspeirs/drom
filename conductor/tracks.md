@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Implement advanced configuration and project management**
+- [~] **Track: Implement advanced configuration and project management**
   *Link: [./conductor/tracks/advanced_config_mgmt_20260213/](./conductor/tracks/advanced_config_mgmt_20260213/)*
