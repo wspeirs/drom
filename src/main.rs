@@ -274,4 +274,28 @@ directories = ["temp"]
         let resolved = project.resolve_command(&commands);
         assert_eq!(resolved, "mvn clean compile test");
     }
+
+    #[test]
+    fn test_resolve_command_no_alias() {
+        let commands = HashMap::new();
+        let project = Project {
+            name: "api".to_string(),
+            command: "ls".to_string(),
+            args: Some(vec!["-la".to_string()]),
+            depends_on: None,
+        };
+        let resolved = project.resolve_command(&commands);
+        assert_eq!(resolved, "ls -la");
+    }
+
+    #[test]
+    fn test_clean_missing_directory() {
+        let config = Config {
+            clean: Some(Clean { directories: vec!["non_existent_dir".to_string()] }),
+            generate: None,
+            projects: None,
+            groups: None,
+        };
+        assert!(config.perform_clean().is_ok());
+    }
 }
